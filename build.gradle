@@ -1,0 +1,71 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'kr.entree.spigradle' version '2.2.3'
+    id 'io.freefair.lombok' version '5.3.0'
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+
+ext {
+    mcVersion = project.property("minecraft.version")
+}
+
+group project.property("plugin.group")
+archivesBaseName = project.property("plugin.name")
+
+spigot {
+    name = project.property("plugin.name")
+    authors = [project.property("plugin.author")]
+    apiVersion = project.property("api.version")
+    load = STARTUP
+    //    depends = ['']
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    papermc()
+    spigot()
+    jitpack()
+}
+
+dependencies {
+    compileOnly spigot(project.property("minecraft.version"))
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.+'
+    testImplementation "org.mockito:mockito-core:3.+"
+    testImplementation mockBukkit()
+    testImplementation 'org.assertj:assertj-core:3.+'
+}
+
+shadowJar {
+    classifier = ''
+}
+
+tasks.build.dependsOn(shadowJar)
+tasks.prepareSpigotPlugins.dependsOn(shadowJar)
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    ignoreFailures = false
+}
+
+processResources {
+    project.properties.put("version", this.version)
+    expand project.properties
+}
+
+defaultTasks 'build'
