@@ -8,8 +8,9 @@ import ca.retrylife.marketcap.commands.MarketCapCommand;
 import ca.retrylife.marketcap.database.DatabaseAPI;
 import ca.retrylife.marketcap.events.InventoryInteraction;
 import ca.retrylife.marketcap.events.PlayerConnection;
+import ca.retrylife.marketcap.util.SentryUtil;
 import co.aikar.commands.PaperCommandManager;
-import io.sentry.Sentry;
+
 
 // import dev.jorel.commandapi.CommandAPICommand;
 // import dev.jorel.commandapi.CommandPermission;
@@ -20,11 +21,7 @@ public class MarketCapPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Connect to sentry for debugging information
-        Sentry.init(options -> {
-            options.setDsn("https://326a28c0d4544344b05469612ee9a29a@o398481.ingest.sentry.io/5619922");
-            options.setTracesSampleRate(0.5);
-        });
+        SentryUtil.configureSentry("https://326a28c0d4544344b05469612ee9a29a@o398481.ingest.sentry.io/5619922", getServer()); 
 
         // Start the database server
         DatabaseAPI.getInstance().startServer();
