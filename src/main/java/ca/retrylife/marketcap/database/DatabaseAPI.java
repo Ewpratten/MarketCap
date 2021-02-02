@@ -1,5 +1,7 @@
 package ca.retrylife.marketcap.database;
 
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
@@ -37,6 +39,10 @@ public class DatabaseAPI {
 
     public void disableTracking(Material mat) {
 
+    }
+
+    public Map<String, Integer> getMarketCapInformation() {
+        return null;
     }
     
     

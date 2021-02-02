@@ -4,11 +4,16 @@ import kr.entree.spigradle.annotations.PluginMain;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import ca.retrylife.marketcap.commands.MarketCapCommand;
 import ca.retrylife.marketcap.database.DatabaseAPI;
-import ca.retrylife.marketcap.events.ContainerInteraction;
 import ca.retrylife.marketcap.events.InventoryInteraction;
 import ca.retrylife.marketcap.events.PlayerConnection;
+import co.aikar.commands.PaperCommandManager;
 import io.sentry.Sentry;
+
+// import dev.jorel.commandapi.CommandAPICommand;
+// import dev.jorel.commandapi.CommandPermission;
+// import dev.jorel.commandapi.arguments.ItemStackArgument;
 
 @PluginMain
 public class MarketCapPlugin extends JavaPlugin {
@@ -27,7 +32,22 @@ public class MarketCapPlugin extends JavaPlugin {
         // Add event listeners
         getServer().getPluginManager().registerEvents(new PlayerConnection(), this);
         getServer().getPluginManager().registerEvents(new InventoryInteraction(), this);
-        getServer().getPluginManager().registerEvents(new ContainerInteraction(), this);
+
+        // Plugin management
+        PaperCommandManager manager = new PaperCommandManager(this);
+        manager.registerCommand(new MarketCapCommand());
+
+        // Set up item add and remove commands
+        // CommandAPICommand itemAddCommand = new CommandAPICommand("add").withPermission(CommandPermission.OP)
+        //         .withArguments(new ItemStackArgument("type"));
+        // CommandAPICommand itemRemoveCommand = new CommandAPICommand("remove").withPermission(CommandPermission.OP)
+        //         .withArguments(new ItemStackArgument("type"));
+        // CommandAPICommand dbStatCommand = new CommandAPICommand("dbstat").withPermission(CommandPermission.NONE);
+
+        // // Add command listeners
+        // new CommandAPICommand("mcap").withPermission(CommandPermission.NONE).executes(new MCapCommand())
+        //         .withSubcommand(itemAddCommand).withSubcommand(itemRemoveCommand).withSubcommand(dbStatCommand).register();
+
     }
 
 }

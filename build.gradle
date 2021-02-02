@@ -37,10 +37,24 @@ repositories {
     papermc()
     spigot()
     jitpack()
-    maven {
-        url "https://libraries.minecraft.net"
-    }
+    maven { url "https://libraries.minecraft.net" }
+    maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+    maven { url = "https://hub.spigotmc.org/nexus/content/groups/public/" }
 }
+
+def urlFile = { url, name ->
+    File file = new File("$buildDir/download/${name}.jar")
+    file.parentFile.mkdirs()
+    if (!file.exists()) {
+        new URL(url).withInputStream { downloadStream ->
+            file.withOutputStream { fileOut ->
+                fileOut << downloadStream
+            }
+        }
+    }
+    files(file.absolutePath)
+}
+
 
 dependencies {
 
@@ -58,6 +72,8 @@ dependencies {
 
     // Command parsing
     compile 'com.mojang:brigadier:1.0.17'
+    // implementation urlFile("https://github.com/JorelAli/CommandAPI/releases/download/v5.8/CommandAPI.jar", "commandapi")
+    compile "co.aikar:acf-paper:0.5.0-SNAPSHOT"
 
     // Database
     implementation 'com.github.kstyrc:embedded-redis:0.6'
@@ -67,6 +83,8 @@ dependencies {
 
 shadowJar {
     classifier = ''
+    relocate 'co.aikar.commands', "${project.property('plugin.group')}.${project.property('plugin.name')}.acf"
+    relocate 'co.aikar.locales', "${project.property('plugin.group')}.${project.property('plugin.name')}.locales"
 }
 
 tasks.build.dependsOn(shadowJar)
