@@ -2,7 +2,11 @@ package ca.retrylife.marketcap;
 
 import kr.entree.spigradle.annotations.PluginMain;
 
+import java.io.File;
+
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
 import ca.retrylife.marketcap.commands.MarketCapCommand;
 import ca.retrylife.marketcap.database.DatabaseAPI;
@@ -13,6 +17,13 @@ import co.aikar.commands.PaperCommandManager;
 
 @PluginMain
 public class MarketCapPlugin extends JavaPlugin {
+
+    public MarketCapPlugin() {
+    }
+
+    public MarketCapPlugin(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+        super(loader, description, dataFolder, file);
+    }
 
     @Override
     public void onEnable() {

@@ -29,6 +29,9 @@ spigot {
     apiVersion = project.property("api.version")
     load = STARTUP
     //    depends = ['']
+    debug {
+         buildVersion = project.property("minecraft.version")
+    }
 }
 
 repositories {
@@ -76,7 +79,8 @@ dependencies {
     compile "co.aikar:acf-paper:0.5.0-SNAPSHOT"
 
     // Database
-    implementation 'com.github.kstyrc:embedded-redis:0.6'
+    // implementation 'com.github.kstyrc:embedded-redis:0.6'
+    compile 'com.github.tonivade:claudb:1.7.1'
     compile 'redis.clients:jedis:3.5.1'
 
 }
@@ -101,6 +105,12 @@ test {
 processResources {
     project.properties.put("version", this.version)
     expand project.properties
+}
+
+compileJava {
+    options.compilerArgs += ["-parameters"]
+    options.fork = true
+    options.forkOptions.executable = 'javac'
 }
 
 defaultTasks 'build'
