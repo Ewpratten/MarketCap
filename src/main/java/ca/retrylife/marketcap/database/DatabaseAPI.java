@@ -23,6 +23,10 @@ public class DatabaseAPI {
     // Hidden constructor to force singleton usage
     private DatabaseAPI(){}
 
+    public void startServer() {
+        
+    }
+
     public void updateInventory(Inventory inventory, String ownerHash) {
         
     }
