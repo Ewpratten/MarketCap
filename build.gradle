@@ -37,15 +37,32 @@ repositories {
     papermc()
     spigot()
     jitpack()
+    maven {
+        url "https://libraries.minecraft.net"
+    }
 }
 
 dependencies {
+
+    // Game core
     compileOnly spigot(project.property("minecraft.version"))
 
+    // Tests
     testImplementation 'org.junit.jupiter:junit-jupiter:5.+'
     testImplementation "org.mockito:mockito-core:3.+"
     testImplementation mockBukkit()
     testImplementation 'org.assertj:assertj-core:3.+'
+
+    // Analytics
+    implementation 'io.sentry:sentry:4.0.0'
+
+    // Command parsing
+    compile 'com.mojang:brigadier:1.0.17'
+
+    // Database
+    implementation 'com.github.kstyrc:embedded-redis:0.6'
+    compile 'redis.clients:jedis:3.5.1'
+
 }
 
 shadowJar {
