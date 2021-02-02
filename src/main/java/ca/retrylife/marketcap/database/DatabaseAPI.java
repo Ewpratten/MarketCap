@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 
 import ca.retrylife.marketcap.util.SentryUtil;
 import io.sentry.Sentry;
+import redis.clients.jedis.Jedis;
 import redis.embedded.RedisServer;
 
 public class DatabaseAPI {
@@ -29,7 +30,8 @@ public class DatabaseAPI {
 
     // Redis
     private static final int REDIS_DB_PORT = 6370;
-    private RedisServer server = null;
+    private RedisServer server;
+    private Jedis client;
 
     // Hidden constructor to force singleton usage
     private DatabaseAPI() {
@@ -55,6 +57,9 @@ public class DatabaseAPI {
 
         // Start the server
         server.start();
+
+        // Connect to self
+        client = new Jedis("localhost", REDIS_DB_PORT);
     }
 
     public void stopServer() {
@@ -64,6 +69,9 @@ public class DatabaseAPI {
 
         // Stop server
         server.stop();
+
+        // Stop the client
+        client.close();
     }
 
     public void updateInventory(Inventory inventory, String ownerHash) {
