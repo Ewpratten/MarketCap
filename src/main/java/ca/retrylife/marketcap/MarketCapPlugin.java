@@ -1,4 +1,4 @@
-package ca.retrylige.marketcap;
+package ca.retrylife.marketcap;
 
 import kr.entree.spigradle.annotations.PluginMain;
 
