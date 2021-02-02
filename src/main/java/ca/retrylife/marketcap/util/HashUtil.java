@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.entity.Player;
 
 import io.sentry.Sentry;
 
@@ -45,6 +46,32 @@ public class HashUtil {
         // Build hash
         digest.update(data.getBytes());
         return new String(digest.digest());
+
+    }
+
+    /**
+     * Get a unique hash for a player
+     * 
+     * @param player {@link Player}
+     * @return Hash string
+     */
+    public static String getPlayerHash(Player player) {
+
+        // Players already have UUIDs
+        return player.getUniqueId().toString();
+
+    }
+
+    /**
+     * Get a unique hash for a player's end chest
+     * 
+     * @param player {@link Player}
+     * @return Hash string
+     */
+    public static String getEndChestHash(Player player) {
+
+        // Players already have UUIDs
+        return player.getUniqueId().toString() + "-E";
 
     }
 
