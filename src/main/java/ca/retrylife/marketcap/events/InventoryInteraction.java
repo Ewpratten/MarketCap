@@ -15,6 +15,7 @@ public class InventoryInteraction implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
+        System.out.println("Searching onClose inventory");
 
         // Only pay attention to players
         if (event.getPlayer() instanceof Player) {
@@ -44,6 +45,7 @@ public class InventoryInteraction implements Listener {
 
     @EventHandler
     public void onPickUp(EntityPickupItemEvent event) {
+        System.out.println("Searching onPickUp inventory");
 
         // Only pay attention to players
         if (event.getEntity() instanceof Player) {
