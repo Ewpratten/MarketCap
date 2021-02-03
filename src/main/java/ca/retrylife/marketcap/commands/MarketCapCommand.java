@@ -2,6 +2,7 @@ package ca.retrylife.marketcap.commands;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.prefs.BackingStoreException;
 
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -15,6 +16,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
+import io.sentry.Sentry;
 
 @CommandAlias("mcap|marketcap")
 @Description("Server market cap information")
@@ -25,7 +27,18 @@ public class MarketCapCommand extends BaseCommand {
         SentryUtil.breadcrumb(getClass(), "Command run: /mcap info");
 
         // Get the cap information
-        Map<String, Integer> items = DatabaseAPI.getInstance().getMarketCapInformation();
+        Map<String, Integer> items;
+        try {
+            items = DatabaseAPI.getInstance().getMarketCapInformation();
+        } catch (BackingStoreException e) {
+            Sentry.captureException(e);
+            e.printStackTrace();
+
+            // Notify user
+            sender.sendMessage(
+                    "An internal plugin error occurred. Contact the server admin (more information in server logs)");
+            return;
+        }
 
         // Print info
         sender.sendMessage("Estimated market cap:");
@@ -34,6 +47,35 @@ public class MarketCapCommand extends BaseCommand {
         }
 
     }
+
+    @Subcommand("dbInfo")
+    @Description("Perform a database dump")
+    @CommandPermission("marketcap.debug")
+    public void onDbInfo(CommandSender sender) {
+        SentryUtil.breadcrumb(getClass(), "Command run: /mcap dbInfo");
+
+        // Get the db information
+        Map<String, String> databaseDump;
+        try {
+            databaseDump = DatabaseAPI.getInstance().dumpDB();
+        } catch (BackingStoreException e) {
+            Sentry.captureException(e);
+            e.printStackTrace();
+
+            // Notify user
+            sender.sendMessage(
+                    "An internal plugin error occurred. Contact the server admin (more information in server logs)");
+            return;
+        }
+
+        // Print info
+        sender.sendMessage("Database:");
+        for (Entry<String, String> entry : databaseDump.entrySet()) {
+            sender.sendMessage(String.format(" %s = %s", entry.getKey(), entry.getValue()));
+        }
+        
+    }
+    
 
     @Subcommand("addFilter")
     @Description("Start tracking a new item")

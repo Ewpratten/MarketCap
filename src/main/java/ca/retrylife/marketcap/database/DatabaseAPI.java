@@ -175,7 +175,7 @@ public class DatabaseAPI {
      */
     public Map<String, Integer> getMarketCapInformation() throws BackingStoreException {
 
-        // Build and output map
+        // Build an output map
         Map<String, Integer> output = new HashMap<>();
 
         // Search every db entry
@@ -210,6 +210,23 @@ public class DatabaseAPI {
 
         return output;
 
+    }
+
+    public Map<String, String> dumpDB() throws BackingStoreException {
+
+        // Build an output map
+        Map<String, String> output = new HashMap<>();
+
+        // Search every db entry
+        for (String key : datastore.keys()) {
+
+           // Write the entry
+           output.put(key, datastore.get(key, "null"));
+
+        }
+
+        return output;
+        
     }
 
 }
