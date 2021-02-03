@@ -3,7 +3,6 @@ package ca.retrylife.marketcap;
 import kr.entree.spigradle.annotations.PluginMain;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
