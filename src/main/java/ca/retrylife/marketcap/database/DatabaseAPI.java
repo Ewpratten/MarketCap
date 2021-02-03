@@ -8,9 +8,11 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 
 import ca.retrylife.marketcap.database.types.MaterialList;
 import ca.retrylife.marketcap.util.SentryUtil;
@@ -48,26 +50,36 @@ public class DatabaseAPI {
         SentryUtil.breadcrumb(getClass(), "Instantiated DatabaseAPI Singleton");
 
         // Connect to local datastore
-        this.datastore = Preferences.systemNodeForPackage(getClass());
+        // We need to manually set a name here, since the plugin may be obfuscated
+        this.datastore = Preferences.userRoot().node("ca_retrylife_marketcap_database_DatabaseAPI");
 
     }
 
-    /**
-     * Update all database entries for any given inventory
-     * 
-     * @param inventory Entity or block {@link Inventory}
-     * @param ownerHash Hash of the {@link Inventory} owner
-     */
+    public void wipe() throws BackingStoreException {
+        this.datastore.clear();
+    }
+
     public void updateInventory(Inventory inventory, String ownerHash) {
+        updateInventory(inventory, ownerHash, 1);
+    }
 
-        // Get the current tracking list
-        MaterialList trackingList = new MaterialList(datastore.get(TRACKED_ITEMS_LIST_KEY, null));
-
+    public Map<String, Integer> tallyItemsInInventory(Inventory inventory, MaterialList trackingList) {
         // Build an empty mapping to story tallies
         Map<String, Integer> itemTally = new HashMap<String, Integer>();
 
+        // add a 0-count
+        for (String materialName : trackingList.getList()) {
+            itemTally.put(materialName, 0);
+        }
+
         // Search the inventory
         for (ItemStack itemStack : inventory) {
+
+            // Skip null items
+            if (itemStack == null) {
+                continue;
+            }
+
             for (String materialName : trackingList.getList()) {
 
                 // Search for a name match
@@ -90,16 +102,56 @@ public class DatabaseAPI {
 
             }
         }
+        return itemTally;
+    }
+
+    /**
+     * Update all database entries for any given inventory
+     * 
+     * @param inventory Entity or block {@link Inventory}
+     * @param ownerHash Hash of the {@link Inventory} owner
+     */
+    public void updateInventory(Inventory inventory, String ownerHash, int div) {
+
+        // Get the current tracking list
+        MaterialList trackingList = new MaterialList(datastore.get(TRACKED_ITEMS_LIST_KEY, null));
+
+        Map<String, Integer> inventoryTopLevelTally = tallyItemsInInventory(inventory, trackingList);
+
+        // Merge in every sub-inventory
+        for (ItemStack itemStack : inventory) {
+
+            // Handle null items
+            if(itemStack == null){
+                continue;
+            }
+
+            // Check for BlockInventoryHolder
+            if (itemStack.getItemMeta() instanceof BlockStateMeta) {
+                BlockStateMeta im = (BlockStateMeta) itemStack.getItemMeta();
+                if (im.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulker = (ShulkerBox) im.getBlockState();
+
+                    // Get the tally for the shulker
+                    Map<String, Integer> tally = tallyItemsInInventory(shulker.getSnapshotInventory(), trackingList);
+
+                    // Merge into the root inventory
+                    inventoryTopLevelTally.putAll(tally);
+
+                }
+            }
+
+        }
 
         // Write each tally
-        itemTally.entrySet().forEach((entry) -> {
+        inventoryTopLevelTally.entrySet().forEach((entry) -> {
 
             // Construct a key name
             String key = String.format("%s%s%s%s%s", INVENTORY_TALLY_PREFIX_KEY, INVENTORY_INFO_SEPARATOR, ownerHash,
                     INVENTORY_INFO_SEPARATOR, entry.getKey());
 
             // Write
-            datastore.put(key, entry.getValue().toString());
+            datastore.put(key, Integer.toString(entry.getValue() / div));
 
         });
 
@@ -220,13 +272,13 @@ public class DatabaseAPI {
         // Search every db entry
         for (String key : datastore.keys()) {
 
-           // Write the entry
-           output.put(key, datastore.get(key, "null"));
+            // Write the entry
+            output.put(key, datastore.get(key, "null"));
 
         }
 
         return output;
-        
+
     }
 
 }

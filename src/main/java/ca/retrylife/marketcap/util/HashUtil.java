@@ -1,5 +1,6 @@
 package ca.retrylife.marketcap.util;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -44,7 +45,7 @@ public class HashUtil {
 
         // Build hash
         digest.update(data.getBytes());
-        return new String(digest.digest());
+        return new BigInteger(1, digest.digest()).toString(16).substring(0, 20);
     }
 
     /**
@@ -76,7 +77,7 @@ public class HashUtil {
 
         // Build hash
         digest.update(data.getBytes());
-        return new String(digest.digest());
+        return new BigInteger(1, digest.digest()).toString(16).substring(0, 20);
 
     }
 

@@ -1,6 +1,7 @@
 package ca.retrylife.marketcap.database.types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -31,7 +32,7 @@ public class MaterialList {
         } else {
 
             // Split by commas, and turn to list
-            this.enumNames = new ArrayList<String>(List.of(commaSeparated.split(",")));
+            this.enumNames = new ArrayList<String>(Arrays.asList(commaSeparated.split(",")));
 
         }
     }

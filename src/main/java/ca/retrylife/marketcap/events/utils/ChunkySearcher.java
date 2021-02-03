@@ -3,6 +3,7 @@ package ca.retrylife.marketcap.events.utils;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -35,11 +36,14 @@ public class ChunkySearcher {
      * @param chunkRadius Radius to search
      */
     public void search(CommandSender sender, int chunkRadius) {
+        // System.out.println("CS");
 
         // Ensure the radius is reasonable
         if (chunkRadius > MAX_RADIUS && chunkRadius < 1) {
-            sender.sendMessage(
-                    String.format("Chunk radius %d is outside valid range [1, %d]", chunkRadius, MAX_RADIUS));
+            if (sender != null) {
+                sender.sendMessage(
+                        String.format("Chunk radius %d is outside valid range [1, %d]", chunkRadius, MAX_RADIUS));
+            }
             return;
         }
 
@@ -52,19 +56,67 @@ public class ChunkySearcher {
                 for (int z = -(chunkRadius * 16); z <= chunkRadius * 16; z++) {
 
                     // Get the referenced block
-                    Block curBlock = centre.getRelative(x, y, z);
+                    Block curBlock = centre.getRelative(x, y - centre.getY(), z);
 
                     // Check if this block is a container
                     if (curBlock.getState() instanceof InventoryHolder) {
 
-                        // Get the block hash
-                        String hash = HashUtil.getBlockHash(curBlock);
+                        if (((InventoryHolder) curBlock.getState()).getInventory() instanceof DoubleChestInventory) {
 
-                        // Get block inventory
-                        Inventory inventory = ((InventoryHolder) curBlock.getState()).getInventory();
+                            // Get the block hash
+                            String hash = HashUtil.getBlockHash(curBlock);
 
-                        // Search the inventory
-                        DatabaseAPI.getInstance().updateInventory(inventory, hash);
+                            // Get block inventory
+                            Inventory inventory = ((InventoryHolder) curBlock.getState()).getInventory();
+
+                            // Search the inventory
+                            DatabaseAPI.getInstance().updateInventory(inventory, hash, 2);
+
+                            // // Check which side we are looking at
+                            // if (curBlock.getLocation().equals(
+                            //         ((DoubleChestInventory) ((InventoryHolder) curBlock.getState()).getInventory())
+                            //                 .getHolder().getLeftSide().getInventory().getLocation())) {
+
+                            //     // Left
+
+                            //     // Get the block hash
+                            //     String hash = HashUtil.getBlockHash(curBlock) + "L";
+
+                            //     // Get block inventory
+                            //     Inventory inventory = ((DoubleChestInventory) ((InventoryHolder) curBlock.getState())
+                            //             .getInventory()).getHolder().getInventory();
+
+                            //     // Search the inventory
+                            //     DatabaseAPI.getInstance().updateInventory(inventory, hash);
+
+                            // } 
+                            // else {
+
+                            //     // Right
+
+                            //     // Get the block hash
+                            //     String hash = HashUtil.getBlockHash(curBlock) + "R";
+
+                            //     // Get block inventory
+                            //     Inventory inventory = ((DoubleChestInventory) ((InventoryHolder) curBlock.getState())
+                            //     .getInventory()).getHolder().getRightSide().getInventory();
+
+                            //     // Search the inventory
+                            //     DatabaseAPI.getInstance().updateInventory(inventory, hash);
+
+                            // }
+
+                        } else {
+
+                            // Get the block hash
+                            String hash = HashUtil.getBlockHash(curBlock);
+
+                            // Get block inventory
+                            Inventory inventory = ((InventoryHolder) curBlock.getState()).getInventory();
+
+                            // Search the inventory
+                            DatabaseAPI.getInstance().updateInventory(inventory, hash);
+                        }
 
                     }
 

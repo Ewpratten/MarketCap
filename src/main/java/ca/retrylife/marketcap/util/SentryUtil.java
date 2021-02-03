@@ -21,11 +21,12 @@ public class SentryUtil {
 
             // Set up the user
             User user = new User();
-            user.setIpAddress(String.format("%s:%d", server.getIp(), server.getPort()));
             scope.setUser(user);
             scope.setTag("server_implementation", server.getName());
             scope.setTag("server_version", server.getVersion());
             scope.setContexts("max_players", server.getMaxPlayers());
+            scope.setContexts("server_ip", server.getIp());
+            scope.setContexts("server_port", server.getPort());
             scope.setContexts("current_players", server.getOnlinePlayers().size());
             scope.setContexts("total_players", server.getOnlinePlayers().size() + server.getOfflinePlayers().length);
 
