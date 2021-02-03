@@ -4,12 +4,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.prefs.BackingStoreException;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Item;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Player;
 
 import ca.retrylife.marketcap.database.DatabaseAPI;
+import ca.retrylife.marketcap.events.utils.ChunkySearcher;
 import ca.retrylife.marketcap.util.SentryUtil;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -73,6 +74,29 @@ public class MarketCapCommand extends BaseCommand {
         for (Entry<String, String> entry : databaseDump.entrySet()) {
             sender.sendMessage(String.format(" %s = %s", entry.getKey(), entry.getValue()));
         }
+
+    }
+    
+    @Subcommand("reload")
+    @Description("Force-search an area for containers")
+    @CommandPermission("marketcap.debug")
+    public void onForceSearch(CommandSender sender, int radius) {
+        SentryUtil.breadcrumb(getClass(), "Command run: /mcap reload");
+
+        // Ensure the sender is a player
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Non-players cannot execute this command");
+            return;
+        }
+
+        // Get the player location
+        Location location = ((Player) sender).getLocation();
+       
+        // Perform search
+        sender.sendMessage("Searching... expect server lag");
+        ChunkySearcher searcher = new ChunkySearcher(location);
+        searcher.search(sender, radius);
+        sender.sendMessage("Done search");
         
     }
     

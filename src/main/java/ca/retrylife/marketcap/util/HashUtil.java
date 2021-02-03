@@ -17,6 +17,37 @@ import io.sentry.Sentry;
 public class HashUtil {
 
     /**
+     * Get a unique hash for a physical block
+     * 
+     * @param container {@link Block}
+     * @return Hash string
+     */
+    public static String getBlockHash(Block block) {
+
+        // Get needed components
+        Location location = block.getLocation();
+        World world = block.getWorld();
+
+        // Build data string to be hashed
+        String data = String.format("Container<%s:%s:%s>", location.toString(), world.getName(),
+                block.getType().toString());
+
+        // Get hash function
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            Sentry.captureException(e);
+            e.printStackTrace();
+            return data;
+        }
+
+        // Build hash
+        digest.update(data.getBytes());
+        return new String(digest.digest());
+    }
+
+    /**
      * Get a unique hash for a physical container
      * 
      * @param container {@link Container}
